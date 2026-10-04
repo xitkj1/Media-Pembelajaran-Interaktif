@@ -1,0 +1,950 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modul Pembelajaran Interaktif Bubble Sort PTIK</title>
+    <meta name="description" content="Modul pembelajaran multimedia interaktif algoritma pengurutan Bubble Sort untuk mahasiswa semester II PTIK dengan visualisasi langkah demi langkah, simulasi hands-on, dan kuis adaptif." />
+    <meta property="og:title" content="Modul Pembelajaran Interaktif Bubble Sort PTIK" />
+    <meta property="og:description" content="Modul pembelajaran multimedia interaktif algoritma pengurutan Bubble Sort untuk mahasiswa semester II PTIK dengan visualisasi langkah demi langkah, simulasi hands-on, dan kuis adaptif." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-[#070F20] text-slate-100 antialiased selection:bg-sky-500/30 selection:text-sky-200 min-h-screen flex flex-col font-sans">
+    
+    <!-- TOP NAVIGATION BAR -->
+    <header class="sticky top-0 z-50 w-full bg-slate-950/90 backdrop-blur-md border-b border-slate-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <!-- Zone 1: Wordmark -->
+        <button id="nav-brand-btn" class="text-lg font-semibold tracking-tight text-white hover:text-sky-400 transition-colors flex items-center gap-2 cursor-pointer">
+          <span class="inline-block w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse"></span>
+          <span>BubbleSort PTIK</span>
+        </button>
+
+        <!-- Zone 2: Navigation Links -->
+        <nav class="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-300">
+          <button data-nav-target="1" class="nav-screen-btn py-1 text-sky-400 font-semibold relative transition-colors cursor-pointer">
+            <span>Pembuka</span>
+            <span class="nav-active-indicator absolute bottom-0 left-0 right-0 h-0.5 bg-sky-400 rounded-full"></span>
+          </button>
+          <button data-nav-target="2" class="nav-screen-btn py-1 text-slate-300 hover:text-white relative transition-colors cursor-pointer">
+            <span>Peta Materi</span>
+            <span class="nav-active-indicator hidden absolute bottom-0 left-0 right-0 h-0.5 bg-sky-400 rounded-full"></span>
+          </button>
+          <button data-nav-target="3" class="nav-screen-btn py-1 text-slate-300 hover:text-white relative transition-colors cursor-pointer">
+            <span>Tujuan</span>
+            <span class="nav-active-indicator hidden absolute bottom-0 left-0 right-0 h-0.5 bg-sky-400 rounded-full"></span>
+          </button>
+          <button data-nav-target="4" class="nav-screen-btn py-1 text-slate-300 hover:text-white relative transition-colors cursor-pointer">
+            <span>Konsep</span>
+            <span class="nav-active-indicator hidden absolute bottom-0 left-0 right-0 h-0.5 bg-sky-400 rounded-full"></span>
+          </button>
+          <button data-nav-target="5" class="nav-screen-btn py-1 text-slate-300 hover:text-white relative transition-colors cursor-pointer">
+            <span>Simulasi</span>
+            <span class="nav-active-indicator hidden absolute bottom-0 left-0 right-0 h-0.5 bg-sky-400 rounded-full"></span>
+          </button>
+          <button data-nav-target="6" class="nav-screen-btn py-1 text-slate-300 hover:text-white relative transition-colors cursor-pointer">
+            <span>Kuis & Evaluasi</span>
+            <span class="nav-active-indicator hidden absolute bottom-0 left-0 right-0 h-0.5 bg-sky-400 rounded-full"></span>
+          </button>
+        </nav>
+
+        <!-- Zone 3: Primary Actions -->
+        <div class="flex items-center gap-3">
+          <div class="hidden sm:flex items-center gap-2 text-xs text-slate-400 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg">
+            <span>Progres</span>
+            <div class="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+              <div id="top-progress-bar" class="h-full bg-sky-400 transition-all duration-300 rounded-full" style="width: 25%"></div>
+            </div>
+            <span id="top-progress-text" class="font-mono text-slate-200 tabular-nums">25%</span>
+          </div>
+
+          <button id="toggle-sound-btn" class="p-2 text-slate-300 hover:text-white bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-lg transition-colors cursor-pointer" title="Nyalakan/Bisukan Audio">
+            <svg id="icon-sound-on" class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z"/></svg>
+            <svg id="icon-sound-off" class="w-4 h-4 text-rose-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z m11.414-4l4 4m0-4l-4 4"/></svg>
+          </button>
+
+          <button id="reset-module-btn" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-lg transition-colors cursor-pointer" title="Mulai Ulang Seluruh Modul">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span>Reset</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN APP SCREENS CONTAINER -->
+    <main class="flex-1 flex flex-col">
+
+      <!-- ================= LAYAR 1: HALAMAN PEMBUKA ================= -->
+      <section id="screen-1" class="screen-view active relative min-h-[calc(100vh-4rem)] flex flex-col justify-between items-center px-4 py-12 md:py-16 bg-[#070F20] overflow-hidden">
+        <!-- Background radial glows -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-10 right-10 w-72 h-72 bg-blue-600/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="absolute top-20 left-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+    
+
+        <!-- Hero title & description -->
+        <div class="relative z-10 max-w-4xl mx-auto text-center space-y-6 my-auto">
+          <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
+            Belajar Algoritma Pengurutan Data: <br class="hidden sm:inline" />
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-cyan-300 to-blue-400">
+              Bubble Sort
+            </span>
+          </h1>
+
+          <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+            Modul multimedia interaktif yang dirancang khusus untuk mempermudah Anda melacak posisi elemen pada setiap iterasi pengurutan dengan umpan balik visual seketika.
+          </p>
+
+          <!-- Interactive Mini Bar Chart Preview -->
+          <div class="pt-6 pb-2">
+            <div class="inline-block bg-slate-900/80 border border-slate-800/80 rounded-2xl p-6 sm:p-8 backdrop-blur-sm shadow-2xl max-w-xl w-full text-left">
+              <div class="flex items-center justify-between mb-4 text-xs text-slate-400">
+                <span class="flex items-center gap-1.5 text-sky-400 font-medium">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                  Simulasi Visual Deretan Angka
+                </span>
+                <button id="hero-replay-btn" class="flex items-center gap-1 text-slate-400 hover:text-white transition-colors cursor-pointer" title="Putar Ulang Preview">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                  <span>Ulangi Preview</span>
+                </button>
+              </div>
+
+              <!-- Bar visualizer container -->
+              <div id="hero-bars-container" class="h-44 sm:h-48 flex items-end justify-center gap-3 sm:gap-4 px-2 pt-4 pb-2 border-b border-slate-800">
+                <!-- Dynamically generated by JS -->
+              </div>
+
+              <div class="flex justify-between items-center mt-3 text-[11px] text-slate-500 font-mono">
+                <span>Indeks: [0], [1], [2], [3], [4], [5]</span>
+                <span id="hero-status-text" class="text-amber-400/90 font-sans">Gelembung nilai besar mengapung ke kanan</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Bottom Button -->
+        <div class="relative z-10 pt-8 pb-4 text-center">
+          <button id="hero-start-btn" class="group inline-flex items-center gap-3 px-8 py-4 text-base sm:text-lg font-semibold text-white bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 rounded-xl shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer">
+            <span>Mulai Belajar</span>
+            <svg class="w-5 h-5 text-sky-100 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+          <p class="mt-3 text-xs text-slate-400">
+            Modul Interaktif Multimedia · Pendidikan Teknologi Informasi dan Komunikasi
+          </p>
+        </div>
+      </section>
+
+      <!-- ================= LAYAR 2: MENU UTAMA (PETA MATERI) ================= -->
+      <section id="screen-2" class="screen-view max-w-6xl mx-auto px-4 py-8 md:py-12 w-full">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-800">
+          <div>
+            <button data-nav-target="1" class="btn-back inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors mb-2 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+              <span>Kembali ke Halaman Pembuka</span>
+            </button>
+            <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              Peta Materi Pembelajaran
+            </h2>
+            <p class="text-slate-400 text-sm mt-1">
+              Pilih topik di bawah ini untuk memulai atau melanjutkan pembelajaran Anda.
+            </p>
+          </div>
+
+          <!-- Progress summary -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 sm:px-4 flex items-center gap-4">
+            <div class="text-right">
+              <div class="text-xs text-slate-400">Status Pembelajaran</div>
+              <div id="menu-completed-label" class="text-sm font-semibold text-slate-100">
+                1 dari 4 Topik Selesai
+              </div>
+            </div>
+            <div id="menu-completed-circle" class="w-12 h-12 rounded-full border-2 border-slate-700 flex items-center justify-center font-mono font-bold text-sky-400 text-sm">
+              25%
+            </div>
+          </div>
+        </div>
+
+        <!-- 2x2 Grid of 4 Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Card 1: Tujuan Pembelajaran -->
+          <div data-nav-target="3" class="menu-card group relative p-6 sm:p-8 rounded-2xl border border-slate-800 bg-slate-900/60 hover:bg-slate-900/90 hover:border-sky-500/60 transition-all duration-200 cursor-pointer shadow-md hover:shadow-sky-500/10">
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <div class="flex items-center gap-3">
+                <div class="p-3 bg-slate-800/80 border border-slate-700/60 rounded-xl text-sky-400 group-hover:scale-105 transition-transform">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                  <span class="text-xs font-mono text-slate-500">01</span>
+                  <h3 class="text-lg font-bold text-white group-hover:text-sky-400 transition-colors">
+                    Tujuan Pembelajaran
+                  </h3>
+                </div>
+              </div>
+              <div id="badge-screen-3" class="menu-status-badge text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800/50 border border-slate-700/40 text-slate-500">
+                Belum Dimulai
+              </div>
+            </div>
+            <p class="text-xs font-medium text-sky-400/90 mb-2">Kompetensi & Sasaran Belajar</p>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Pahami 3 sasaran kompetensi: menjelaskan konsep, menerapkan langkah penukaran, dan menganalisis kompleksitas waktu.
+            </p>
+            <div class="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-slate-400 group-hover:text-sky-300 transition-colors">
+              <span>Buka Materi</span>
+              <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+
+          <!-- Card 2: Konsep & Cara Kerja -->
+          <div data-nav-target="4" class="menu-card group relative p-6 sm:p-8 rounded-2xl border border-slate-800 bg-slate-900/60 hover:bg-slate-900/90 hover:border-sky-500/60 transition-all duration-200 cursor-pointer shadow-md hover:shadow-sky-500/10">
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <div class="flex items-center gap-3">
+                <div class="p-3 bg-slate-800/80 border border-slate-700/60 rounded-xl text-indigo-400 group-hover:scale-105 transition-transform">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                </div>
+                <div>
+                  <span class="text-xs font-mono text-slate-500">02</span>
+                  <h3 class="text-lg font-bold text-white group-hover:text-sky-400 transition-colors">
+                    Konsep & Cara Kerja
+                  </h3>
+                </div>
+              </div>
+              <div id="badge-screen-4" class="menu-status-badge text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800/50 border border-slate-700/40 text-slate-500">
+                Belum Dimulai
+              </div>
+            </div>
+            <p class="text-xs font-medium text-sky-400/90 mb-2">Prinsip & Visualisasi Pass</p>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Pelajari mekanisme perbandingan elemen bersebelahan, animasi putaran (pass), serta analogi gelembung naik ke permukaan.
+            </p>
+            <div class="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-slate-400 group-hover:text-sky-300 transition-colors">
+              <span>Buka Materi</span>
+              <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+
+          <!-- Card 3: Simulasi Interaktif -->
+          <div data-nav-target="5" class="menu-card group relative p-6 sm:p-8 rounded-2xl border border-slate-800 bg-slate-900/60 hover:bg-slate-900/90 hover:border-sky-500/60 transition-all duration-200 cursor-pointer shadow-md hover:shadow-sky-500/10">
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <div class="flex items-center gap-3">
+                <div class="p-3 bg-slate-800/80 border border-slate-700/60 rounded-xl text-cyan-400 group-hover:scale-105 transition-transform">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                  <span class="text-xs font-mono text-slate-500">03</span>
+                  <h3 class="text-lg font-bold text-white group-hover:text-sky-400 transition-colors">
+                    Simulasi Interaktif
+                  </h3>
+                </div>
+              </div>
+              <div id="badge-screen-5" class="menu-status-badge text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800/50 border border-slate-700/40 text-slate-500">
+                Belum Dimulai
+              </div>
+            </div>
+            <p class="text-xs font-medium text-sky-400/90 mb-2">Praktik Mandiri & Uji Coba</p>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Latih kemampuan dengan menukar langsung elemen larik [5, 2, 8, 1, 9] dan perhatikan aturan Bubble Sort secara visual.
+            </p>
+            <div class="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-slate-400 group-hover:text-sky-300 transition-colors">
+              <span>Buka Praktik</span>
+              <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+
+          <!-- Card 4: Kuis & Umpan Balik -->
+          <div data-nav-target="6" class="menu-card group relative p-6 sm:p-8 rounded-2xl border border-slate-800 bg-slate-900/60 hover:bg-slate-900/90 hover:border-sky-500/60 transition-all duration-200 cursor-pointer shadow-md hover:shadow-sky-500/10">
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <div class="flex items-center gap-3">
+                <div class="p-3 bg-slate-800/80 border border-slate-700/60 rounded-xl text-amber-400 group-hover:scale-105 transition-transform">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                </div>
+                <div>
+                  <span class="text-xs font-mono text-slate-500">04</span>
+                  <h3 class="text-lg font-bold text-white group-hover:text-sky-400 transition-colors">
+                    Kuis & Umpan Balik
+                  </h3>
+                </div>
+              </div>
+              <div id="badge-screen-6" class="menu-status-badge text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800/50 border border-slate-700/40 text-slate-500">
+                Belum Dimulai
+              </div>
+            </div>
+            <p class="text-xs font-medium text-sky-400/90 mb-2">Evaluasi Pemahaman & Skoring</p>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Uji pemahaman Anda melalui 5 soal terarah, dapatkan umpan balik instan, lencana pencapaian, dan refleksi akhir.
+            </p>
+            <div class="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-slate-400 group-hover:text-sky-300 transition-colors">
+              <span>Buka Evaluasi</span>
+              <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer suggestion -->
+        <div class="mt-10 p-4 bg-slate-900/40 border border-slate-800 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+          <div>
+            <span class="font-semibold text-slate-300">Alur Belajar yang Disarankan: </span>
+            Mulai dari Tujuan Pembelajaran → Konsep & Cara Kerja → Praktik Simulasi → Evaluasi Kuis.
+          </div>
+          <button data-nav-target="3" class="whitespace-nowrap px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg font-medium transition-colors cursor-pointer">
+            Lanjut ke Materi Pertama
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= LAYAR 3: TUJUAN PEMBELAJARAN ================= -->
+      <section id="screen-3" class="screen-view max-w-4xl mx-auto px-4 py-8 md:py-12 w-full">
+        <!-- Header -->
+        <div class="mb-8">
+          <button data-nav-target="2" class="btn-back inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors mb-3 cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            <span>Kembali ke Menu Utama</span>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-sky-950 border border-sky-800 rounded-xl text-sky-400">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            </div>
+            <div>
+              <span class="text-xs font-mono text-sky-400">BAGIAN 01 · KOMPETENSI DASAR</span>
+              <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                Tujuan Pembelajaran
+              </h2>
+            </div>
+          </div>
+
+          <p class="text-slate-300 text-sm sm:text-base mt-3 leading-relaxed">
+            Setelah menyelesaikan modul multimedia ini, mahasiswa Program Studi PTIK diharapkan menguasai tiga capaian pembelajaran berikut:
+          </p>
+        </div>
+
+        <!-- 3 Sequential Objectives -->
+        <div class="space-y-6">
+          <!-- Poin 1 -->
+          <div class="obj-card p-6 sm:p-7 rounded-2xl border border-slate-800 bg-slate-900/90 shadow-xl transition-all duration-300">
+            <div class="flex items-start justify-between gap-4 mb-3">
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-slate-800 border border-slate-700 rounded-lg text-amber-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                </div>
+                <div>
+                  <span class="text-xs font-mono font-medium text-slate-400">Tujuan 1</span>
+                  <h3 class="text-lg sm:text-xl font-bold text-white">
+                    Menjelaskan Konsep Dasar Algoritma Bubble Sort
+                  </h3>
+                </div>
+              </div>
+              <span class="hidden sm:inline text-xs text-sky-400 font-mono">Poin 01/03</span>
+            </div>
+            <p class="text-xs font-medium text-sky-300 mb-2">Memahami prinsip fundamental perbandingan pasangan bersebelahan</p>
+            <p class="text-sm text-slate-300 leading-relaxed mb-4">
+              Mahasiswa mampu menguraikan definisi, mekanisme komparasi data bersebelahan (adjacent comparison), serta analogi ilmiah bagaimana elemen berbobot terbesar mengapung ke posisi akhir larik seperti gelembung udara dalam cairan.
+            </p>
+            <div class="p-4 bg-slate-950/70 border border-slate-800/80 rounded-xl space-y-2">
+              <div class="text-xs font-semibold text-slate-400">Indikator Pencapaian:</div>
+              <ul class="space-y-1.5 text-xs sm:text-sm text-slate-200">
+                <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✔</span> Prinsip perbandingan elemen bersebelahan: A[j] dengan A[j+1]</li>
+                <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✔</span> Sifat algoritma: Comparison-based, In-Place (hemat memori), dan Stable</li>
+                <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✔</span> Analogi gelembung: setiap putaran mengunci 1 elemen terbesar ke posisi akhir</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Poin 2 -->
+          <div class="obj-card p-6 sm:p-7 rounded-2xl border border-slate-800 bg-slate-900/90 shadow-xl transition-all duration-300">
+            <div class="flex items-start justify-between gap-4 mb-3">
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-slate-800 border border-slate-700 rounded-lg text-sky-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                </div>
+                <div>
+                  <span class="text-xs font-mono font-medium text-slate-400">Tujuan 2</span>
+                  <h3 class="text-lg sm:text-xl font-bold text-white">
+                    Menerapkan Langkah-langkah Pengurutan Data
+                  </h3>
+                </div>
+              </div>
+              <span class="hidden sm:inline text-xs text-sky-400 font-mono">Poin 02/03</span>
+            </div>
+            <p class="text-xs font-medium text-sky-300 mb-2">Melacak iterasi dan mengeksekusi proses pertukaran (swap) secara runtut</p>
+            <p class="text-sm text-slate-300 leading-relaxed mb-4">
+              Mahasiswa mampu melacak dan mengeksekusi operasi penukaran (swap) nilai data pada setiap putaran (pass), memetakan pergeseran indeks, serta memahami penyempitan rentang pemeriksaan pada iterasi berikutnya.
+            </p>
+            <div class="p-4 bg-slate-950/70 border border-slate-800/80 rounded-xl space-y-2">
+              <div class="text-xs font-semibold text-slate-400">Indikator Pencapaian:</div>
+              <ul class="space-y-1.5 text-xs sm:text-sm text-slate-200">
+                <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✔</span> Kondisi penukaran ascending: swap jika A[j] > A[j+1]</li>
+                <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✔</span> Penyusutan batas perbandingan: j berjalan dari indeks 0 hingga n - i - 1</li>
+                <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✔</span> Penetapan elemen terurut di akhir array pada tiap akhir putaran</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Poin 3 -->
+          <div class="obj-card p-6 sm:p-7 rounded-2xl border border-slate-800 bg-slate-900/90 shadow-xl transition-all duration-300">
+            <div class="flex items-start justify-between gap-4 mb-3">
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-slate-800 border border-slate-700 rounded-lg text-emerald-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <div>
+                  <span class="text-xs font-mono font-medium text-slate-400">Tujuan 3</span>
+                  <h3 class="text-lg sm:text-xl font-bold text-white">
+                    Menganalisis Kompleksitas Waktu & Efisiensi Algoritma
+                  </h3>
+                </div>
+              </div>
+              <span class="hidden sm:inline text-xs text-sky-400 font-mono">Poin 03/03</span>
+            </div>
+            <p class="text-xs font-medium text-sky-300 mb-2">Mengevaluasi kinerja Best Case, Worst Case, dan kebutuhan memori</p>
+            <p class="text-sm text-slate-300 leading-relaxed mb-4">
+              Mahasiswa mampu menghitung jumlah operasi komparasi matematika, memahami kompleksitas waktu kuadratik O(n²), serta mengidentifikasi optimasi pendeteksian array yang telah terurut (Best Case O(n)).
+            </p>
+            <div class="p-4 bg-slate-950/70 border border-slate-800/80 rounded-xl space-y-2">
+              <div class="text-xs font-semibold text-slate-400">Indikator Pencapaian:</div>
+              <ul class="space-y-1.5 text-xs sm:text-sm text-slate-200">
+                <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✔</span> Kasus Terburuk (Worst Case): O(n²) saat susunan data terbalik penuh</li>
+                <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✔</span> Kasus Terbaik (Best Case): O(n) dengan optimasi flag/boolean pertukaran</li>
+                <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✔</span> Kompleksitas Ruang (Space Complexity): O(1) karena bersifat In-Place</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="mt-10 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <button data-nav-target="2" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-slate-300 hover:text-white bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl transition-colors cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            <span>Kembali ke Menu Utama</span>
+          </button>
+
+          <button data-nav-target="4" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 rounded-xl shadow-lg shadow-sky-500/20 hover:shadow-sky-500/35 transition-all cursor-pointer">
+            <span>Lanjut ke Konsep & Cara Kerja</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= LAYAR 4: KONSEP & CARA KERJA ================= -->
+      <section id="screen-4" class="screen-view max-w-7xl mx-auto px-4 py-8 md:py-10 w-full">
+        <!-- Header -->
+        <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <button data-nav-target="2" class="btn-back inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors mb-2 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+              <span>Kembali ke Menu Utama</span>
+            </button>
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-mono text-sky-400">BAGIAN 02 · TEORI & DEMO</span>
+              <span class="text-slate-600">·</span>
+              <span class="text-xs text-slate-400">Putaran Pertama (Pass 1)</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              Konsep & Cara Kerja Bubble Sort
+            </h2>
+          </div>
+
+          <!-- Speed presets -->
+          <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 p-1.5 rounded-xl self-start sm:self-auto">
+            <span class="text-xs text-slate-400 px-2">Kecepatan:</span>
+            <button id="speed-slow" class="speed-btn px-2.5 py-1 text-xs rounded-lg font-medium text-slate-400 hover:text-white transition-colors cursor-pointer">0.7x Lambat</button>
+            <button id="speed-normal" class="speed-btn px-2.5 py-1 text-xs rounded-lg font-medium bg-sky-500 text-white font-semibold transition-colors cursor-pointer">1x Normal</button>
+            <button id="speed-fast" class="speed-btn px-2.5 py-1 text-xs rounded-lg font-medium text-slate-400 hover:text-white transition-colors cursor-pointer">2x Cepat</button>
+          </div>
+        </div>
+
+        <!-- 2-Zone Grid: Left Stage (Visualizer) & Right Deck (Explanation) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <!-- Left Zone: Visualizer Sandbox (7 cols) -->
+          <div class="lg:col-span-7 space-y-6">
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+              <!-- Visualizer header status -->
+              <div class="flex items-center justify-between gap-4 mb-6">
+                <div>
+                  <span class="text-xs font-mono font-medium text-slate-400">STATUS ITERASI</span>
+                  <div class="text-sm font-semibold text-white flex items-center gap-2">
+                    <span class="inline-block w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+                    <span id="demo-step-counter">Langkah 0 dari 8</span>
+                  </div>
+                </div>
+
+                <div id="demo-action-badge" class="text-xs font-mono px-3 py-1 rounded-full border border-slate-700 bg-slate-800 text-slate-300">
+                  SIAP MULAI
+                </div>
+              </div>
+
+              <!-- Vertical Bar Canvas -->
+              <div id="demo-bars-container" class="h-64 sm:h-72 flex items-end justify-center gap-4 sm:gap-6 px-4 pt-6 pb-2 border-b border-slate-800 bg-slate-950/60 rounded-xl relative overflow-hidden">
+                <!-- Dynamically populated by JS -->
+              </div>
+
+              <!-- Step Explanation Callout -->
+              <div class="mt-6 p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
+                <div class="flex items-center gap-2 text-xs font-semibold text-sky-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>Analisis Langkah Terkini:</span>
+                </div>
+                <p id="demo-explanation-text" class="text-sm text-slate-200 font-medium leading-relaxed">
+                  Kondisi Awal Larik: Data belum terurut [5, 2, 8, 1, 9]. Putaran 1 (Pass 1) siap dimulai dari indeks 0.
+                </p>
+                <div class="mt-2 pt-2 border-t border-slate-800/80">
+                  <code id="demo-code-text" class="text-xs font-mono text-cyan-300 bg-slate-900 px-2 py-1 rounded block">
+                    // Mulai Pass 1: for (int j = 0; j &lt; n - 1; j++)
+                  </code>
+                </div>
+              </div>
+
+              <!-- Playback Controls Deck -->
+              <div class="mt-6 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                  <button id="demo-play-btn" class="inline-flex items-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-semibold rounded-xl bg-sky-500 hover:bg-sky-400 text-white shadow-md shadow-sky-500/20 transition-all cursor-pointer">
+                    <svg id="demo-play-icon" class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <span id="demo-play-label">Putar Animasi</span>
+                  </button>
+
+                  <button id="demo-step-btn" class="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs sm:text-sm font-medium text-slate-200 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors cursor-pointer">
+                    <span>Langkah Berikutnya</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+                  </button>
+
+                  <button id="demo-reset-btn" class="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs sm:text-sm font-medium text-slate-300 hover:text-white bg-slate-800/70 hover:bg-slate-700 border border-slate-700/60 rounded-xl transition-colors cursor-pointer" title="Kembali ke awal langkah Pass 1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    <span>Ulangi</span>
+                  </button>
+                </div>
+
+                <div id="demo-dots-container" class="flex items-center gap-1.5">
+                  <!-- Dots generated by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Zone: Concept Deck & Explanation (5 cols) -->
+          <div class="lg:col-span-5 space-y-6">
+            <!-- Card 1: Definisi & Prinsip -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+              <div class="flex items-center gap-2 text-xs font-mono font-semibold text-sky-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                <span>PRINSIP BUBBLE SORT</span>
+              </div>
+
+              <h3 class="text-lg font-bold text-white">
+                Mengapa Disebut "Bubble" (Gelembung)?
+              </h3>
+
+              <p class="text-sm text-slate-300 leading-relaxed">
+                Algoritma ini dinamakan <strong>Bubble Sort</strong> karena elemen dengan nilai terbesar secara perlahan <em>"mengapung"</em> ke posisi akhir larik pada setiap akhir putaran, persis seperti gelembung udara dalam kolom air yang bergerak naik ke permukaan.
+              </p>
+
+              <div class="p-3.5 bg-slate-950/70 border border-slate-800 rounded-xl text-xs space-y-2">
+                <div class="font-semibold text-slate-300">Aturan Penukaran (Swap):</div>
+                <p class="text-slate-400 leading-relaxed">
+                  Untuk setiap pasangan bersebelahan <code class="text-amber-300 font-mono">A[j]</code> dan <code class="text-amber-300 font-mono">A[j+1]</code>:
+                </p>
+                <ul class="list-disc list-inside space-y-1 text-slate-300 font-mono text-[11px]">
+                  <li>Jika <code class="text-sky-300">A[j] &gt; A[j+1]</code>: TUKAR posisinya</li>
+                  <li>Jika <code class="text-emerald-400">A[j] &lt;= A[j+1]</code>: JANGAN TUKAR (tetap)</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Card 2: Pseudocode & Kompleksitas -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+              <div class="flex items-center gap-2 text-xs font-mono font-semibold text-indigo-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                <span>STRUKTUR PERULANGAN (NESTED LOOP)</span>
+              </div>
+
+              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80 font-mono text-xs text-slate-300 overflow-x-auto space-y-1">
+                <div class="text-slate-500">// Pseudocode C++ / Java / Python</div>
+                <div><span class="text-indigo-400">for</span> (i = 0; i &lt; n - 1; i++) &#123;</div>
+                <div class="pl-4"><span class="text-indigo-400">for</span> (j = 0; j &lt; n - i - 1; j++) &#123;</div>
+                <div class="pl-8"><span class="text-amber-400">if</span> (A[j] &gt; A[j + 1]) &#123;</div>
+                <div class="pl-12 text-rose-300">swap(A[j], A[j + 1]);</div>
+                <div class="pl-8">&#125;</div>
+                <div class="pl-4">&#125;</div>
+                <div>&#125;</div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 pt-2 text-xs">
+                <div class="p-3 bg-slate-950/60 border border-slate-800 rounded-lg">
+                  <span class="text-slate-400 block mb-1">Worst Case Time</span>
+                  <span class="font-mono text-rose-400 font-bold text-sm">O(n²)</span>
+                  <span class="text-[11px] text-slate-400 block mt-0.5">Larik terbalik</span>
+                </div>
+                <div class="p-3 bg-slate-950/60 border border-slate-800 rounded-lg">
+                  <span class="text-slate-400 block mb-1">Best Case Time</span>
+                  <span class="font-mono text-emerald-400 font-bold text-sm">O(n)</span>
+                  <span class="text-[11px] text-slate-400 block mt-0.5">Sudah terurut</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation buttons -->
+        <div class="mt-10 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <button data-nav-target="2" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-slate-300 hover:text-white bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl transition-colors cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            <span>Kembali ke Menu Utama</span>
+          </button>
+
+          <button data-nav-target="5" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 rounded-xl shadow-lg shadow-sky-500/20 hover:shadow-sky-500/35 transition-all cursor-pointer">
+            <span>Lanjut ke Simulasi Interaktif</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= LAYAR 5: SIMULASI INTERAKTIF ================= -->
+      <section id="screen-5" class="screen-view max-w-6xl mx-auto px-4 py-8 md:py-10 w-full">
+        <!-- Header -->
+        <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <button data-nav-target="2" class="btn-back inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors mb-2 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+              <span>Kembali ke Menu Utama</span>
+            </button>
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-mono text-cyan-400">BAGIAN 03 · SIMULASI INTERAKTIF</span>
+              <span class="text-slate-600">·</span>
+              <span class="text-xs text-slate-400">Praktik Mandiri Mahasiswa PTIK</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              Laboratorium Simulasi Bubble Sort
+            </h2>
+          </div>
+
+          <!-- Controls: Acak Data, Reset Contoh, Bantuan -->
+          <div class="flex items-center gap-2 self-start sm:self-auto">
+            <button id="sim-random-btn" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:text-white bg-slate-900 border border-slate-700/80 hover:border-slate-600 rounded-xl transition-colors cursor-pointer" title="Buat deretan angka acak baru">
+              <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <span>Acak Data Baru</span>
+            </button>
+
+            <button id="sim-reset-example-btn" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl transition-colors cursor-pointer" title="Kembalikan ke data contoh awal [5, 2, 8, 1, 9]">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+              <span>Contoh [5, 2, 8, 1, 9]</span>
+            </button>
+
+            <button id="sim-hint-btn" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-amber-300 hover:text-amber-200 bg-amber-950/40 border border-amber-800/60 hover:border-amber-700 rounded-xl transition-colors cursor-pointer" title="Dapatkan petunjuk pasangan yang perlu diperiksa">
+              <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Bantuan</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Metrics Counter Bar -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+            <span class="text-xs text-slate-400 block mb-1">Total Langkah</span>
+            <span id="sim-step-counter" class="text-xl font-bold font-mono text-white tabular-nums">0</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+            <span class="text-xs text-slate-400 block mb-1">Jumlah Pertukaran (Swap)</span>
+            <span id="sim-swap-counter" class="text-xl font-bold font-mono text-cyan-400 tabular-nums">0</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+            <span class="text-xs text-slate-400 block mb-1">Target Pengurutan</span>
+            <span class="text-xs font-bold text-slate-300 block mt-1">Menaik (Ascending)</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+            <div>
+              <span class="text-xs text-slate-400 block mb-1">Status Larik</span>
+              <span id="sim-status-label" class="text-xs font-bold text-amber-400">▲ Belum Terurut</span>
+            </div>
+            <div id="sim-status-icon">
+              <svg class="w-5 h-5 text-amber-400/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Stage: Interactive Bars -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl relative">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+            <div class="text-xs text-slate-400">
+              <span class="text-white font-medium">Instruksi Praktik: </span>
+              Klik balok pertama, kemudian klik balok tepat di sebelahnya untuk membandingkan dan menukar posisinya.
+            </div>
+            <div class="text-xs font-mono text-slate-400">
+              Array Saat Ini: <span id="sim-array-display" class="text-cyan-300">[5, 2, 8, 1, 9]</span>
+            </div>
+          </div>
+
+          <!-- Interactive Bar Canvas -->
+          <div id="sim-bars-container" class="h-64 sm:h-80 flex items-end justify-center gap-4 sm:gap-8 px-4 pt-8 pb-3 bg-slate-950/70 border border-slate-800/80 rounded-xl relative overflow-hidden">
+            <!-- Dynamically populated by JS -->
+          </div>
+
+          <!-- Live Feedback Banner -->
+          <div id="sim-feedback-box" class="mt-6 p-4 rounded-xl border border-slate-800 bg-slate-950/80 text-slate-300 flex items-start gap-3 transition-colors">
+            <div id="sim-feedback-icon" class="text-sky-400 shrink-0 mt-0.5">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div class="text-xs sm:text-sm leading-relaxed">
+              <span class="font-semibold block mb-0.5">Umpan Balik Visual:</span>
+              <span id="sim-feedback-text">Klik dua balok yang bersebelahan untuk membandingkan dan menukar posisinya sesuai aturan Bubble Sort.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation & Progression Gate -->
+        <div class="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <button data-nav-target="4" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-slate-300 hover:text-white bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl transition-colors cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            <span>Kembali ke Konsep & Cara Kerja</span>
+          </button>
+
+          <div class="w-full sm:w-auto flex flex-col items-center sm:items-end gap-1.5">
+            <button id="sim-proceed-quiz-btn" disabled class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-xl bg-slate-800/80 text-slate-500 border border-slate-700/60 cursor-not-allowed opacity-60 transition-all duration-300">
+              <span>Lanjut ke Kuis & Evaluasi</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </button>
+            <p id="sim-proceed-hint" class="text-[11px] text-amber-400/90 font-medium">
+              * Tombol kuis aktif setelah seluruh deretan angka terurut menaik (ascending).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= LAYAR 6: KUIS, UMPAN BALIK, & ASSESSMENT ================= -->
+      <section id="screen-6" class="screen-view max-w-4xl mx-auto px-4 py-8 md:py-10 w-full">
+        <!-- Header -->
+        <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <button data-nav-target="2" class="btn-back inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors mb-2 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+              <span>Kembali ke Menu Utama</span>
+            </button>
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-mono text-amber-400">BAGIAN 04 · EVALUASI & SKORING</span>
+              <span class="text-slate-600">·</span>
+              <span class="text-xs text-slate-400">5 Soal Pengujian Konsep</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              Kuis & Umpan Balik Pemahaman
+            </h2>
+          </div>
+
+          <div id="quiz-question-counter-box" class="text-right">
+            <div class="text-xs text-slate-400">Soal Aktif</div>
+            <div id="quiz-active-num" class="text-sm font-semibold font-mono text-amber-400">1 / 5</div>
+          </div>
+        </div>
+
+        <!-- 6A: ACTIVE QUIZ VIEW -->
+        <div id="quiz-active-view" class="space-y-6">
+          <!-- Progress Bar -->
+          <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span>Kemajuan Evaluasi</span>
+              <span id="quiz-progress-text" class="font-mono text-slate-200">20% Selesai</span>
+            </div>
+            <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
+              <div id="quiz-progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-sky-400 rounded-full transition-all duration-300" style="width: 20%"></div>
+            </div>
+          </div>
+
+          <!-- Question Card -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
+            <div class="flex items-center justify-between gap-4">
+              <span id="quiz-topic-badge" class="text-xs font-mono px-3 py-1 bg-amber-950/60 border border-amber-800/80 text-amber-300 rounded-full">
+                Topik: Langkah Dasar Algoritma
+              </span>
+              <span class="text-xs text-slate-400 font-mono">Bobot: 20 Poin</span>
+            </div>
+
+            <h3 id="quiz-question-title" class="text-base sm:text-lg font-semibold text-white leading-relaxed">
+              Pertanyaan sedang dimuat...
+            </h3>
+
+            <!-- Options List -->
+            <div id="quiz-options-container" class="space-y-3">
+              <!-- Dynamically populated by JS -->
+            </div>
+
+            <!-- Instant Feedback Callout -->
+            <div id="quiz-feedback-box" class="hidden p-4 rounded-xl border flex items-start gap-3 text-sm leading-relaxed">
+              <div id="quiz-feedback-icon" class="shrink-0 mt-0.5"></div>
+              <div>
+                <span id="quiz-feedback-heading" class="font-bold block mb-1">Tepat Sekali!</span>
+                <p id="quiz-feedback-explanation" class="text-xs sm:text-sm text-slate-200"></p>
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="pt-4 border-t border-slate-800 flex items-center justify-between gap-4">
+              <div id="quiz-instruction-text" class="text-xs text-slate-400">
+                Pilih satu jawaban di atas, lalu tekan Cek Jawaban.
+              </div>
+
+              <div class="flex items-center gap-3">
+                <button id="quiz-check-btn" disabled class="px-6 py-2.5 text-sm font-semibold rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-40 disabled:pointer-events-none text-slate-950 transition-all font-semibold shadow-md shadow-amber-500/20 cursor-pointer">
+                  Cek Jawaban
+                </button>
+                <button id="quiz-next-btn" class="hidden inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white shadow-md shadow-sky-500/20 transition-all cursor-pointer">
+                  <span id="quiz-next-label">Soal Berikutnya</span>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6B: ASSESSMENT RESULT & SCORING VIEW (Hidden until quiz finished) -->
+        <div id="quiz-result-view" class="hidden space-y-8">
+          <!-- Main Score Card -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-10 shadow-2xl text-center relative overflow-hidden">
+            <div id="result-glow" class="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full blur-3xl pointer-events-none opacity-20 bg-emerald-500"></div>
+
+            <!-- Score Ring -->
+            <div class="relative z-10 inline-flex flex-col items-center justify-center mb-6">
+              <div id="result-score-ring" class="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 flex flex-col items-center justify-center p-2 mb-4 border-emerald-500 bg-emerald-950/40 text-emerald-400 shadow-xl shadow-emerald-500/20 ring-4 ring-emerald-500/20">
+                <span id="result-percentage-text" class="text-3xl sm:text-4xl font-extrabold font-mono tabular-nums">100%</span>
+                <span id="result-correct-label" class="text-[11px] font-semibold text-slate-300">5 / 5 Benar</span>
+              </div>
+
+              <!-- Threshold Badge -->
+              <div id="result-badge-container">
+                <!-- Injected by JS: either badge for >=80% or warning for <80% -->
+              </div>
+            </div>
+
+            <!-- Appreciation / Motivation Text -->
+            <div class="relative z-10 max-w-xl mx-auto space-y-3">
+              <h3 id="result-title" class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                Kerja Bagus! Penguasaan Sangat Baik
+              </h3>
+              <p id="result-message" class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                Anda telah menunjukkan pemahaman yang matang mengenai algoritma Bubble Sort, mulai dari mekanisme perbandingan bersebelahan, pergeseran nilai terbesar pada tiap pass, hingga analisis kompleksitas waktu kuadratik.
+              </p>
+            </div>
+
+            <!-- Dynamic Result Action Buttons -->
+            <div id="result-actions-container" class="relative z-10 mt-8 pt-6 border-t border-slate-800 flex flex-wrap items-center justify-center gap-4">
+              <!-- Injected by JS -->
+            </div>
+          </div>
+
+          <!-- Student Reflection Box -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-4">
+            <div class="flex items-center gap-2.5 text-xs font-mono font-semibold text-sky-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+              <span>SESI REFLEKSI MAHASISWA PTIK</span>
+            </div>
+
+            <div>
+              <h4 class="text-base font-bold text-white">Pertanyaan Refleksi Akhir:</h4>
+              <p class="text-xs sm:text-sm text-slate-300 mt-1">
+                "Bagian mana dari algoritma Bubble Sort yang menurutmu paling sulit dipahami?"
+              </p>
+            </div>
+
+            <!-- Reflection Form -->
+            <form id="reflection-form" class="space-y-4">
+              <textarea id="reflection-input" placeholder="Tuliskan refleksi Anda di sini..." rows="3" class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl p-3.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-sky-500 transition-colors" required></textarea>
+
+              <div class="flex flex-wrap gap-2 text-xs">
+                <span class="text-slate-400 py-1">Pilih cepat:</span>
+                <button type="button" class="reflection-chip px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg text-xs transition-colors cursor-pointer" data-text="Melacak pergeseran elemen pada inner loop (j) dan batas perbandingan n - i - 1.">
+                  Pergeseran Inner Loop
+                </button>
+                <button type="button" class="reflection-chip px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg text-xs transition-colors cursor-pointer" data-text="Memahami alasan matematis di balik kompleksitas waktu kuadratik O(n²).">
+                  Analisis Kompleksitas O(n²)
+                </button>
+                <button type="button" class="reflection-chip px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg text-xs transition-colors cursor-pointer" data-text="Membedakan kapan swap harus dilakukan saat perbandingan elemen bersebelahan.">
+                  Aturan Kondisional Swap
+                </button>
+              </div>
+
+              <div class="flex justify-end">
+                <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-500 rounded-xl transition-all shadow-md shadow-sky-600/20 cursor-pointer">
+                  <span>Kirim Refleksi</span>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                </button>
+              </div>
+            </form>
+
+            <!-- Reflection Submitted Card -->
+            <div id="reflection-success-box" class="hidden p-4 bg-emerald-950/40 border border-emerald-800/60 rounded-xl space-y-2">
+              <div class="flex items-center gap-2 text-emerald-400 font-semibold text-xs sm:text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                <span>Refleksi Anda Berhasil Disimpan!</span>
+              </div>
+              <p id="reflection-saved-quote" class="text-xs text-slate-300 italic"></p>
+              <p class="text-xs text-slate-400 pt-1 border-t border-emerald-900/50">
+                Umpan balik Anda sangat bernilai untuk pengembangan materi multimedia pembelajaran PTIK berikutnya.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- COMPLETION MODAL DIALOG -->
+    <div id="modal-completion" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-6">
+        <div class="text-center space-y-2">
+          <div class="w-16 h-16 bg-emerald-950 border border-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-emerald-400 mb-3 shadow-lg shadow-emerald-500/20">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+          </div>
+          <h3 class="text-xl font-bold text-white">Sertifikat Kelulusan Modul</h3>
+          <p class="text-xs sm:text-sm text-slate-300">
+            Selamat! Anda telah menyelesaikan seluruh rangkaian modul pembelajaran multimedia Bubble Sort dengan predikat sangat memuaskan.
+          </p>
+        </div>
+
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs space-y-2 font-mono">
+          <div class="flex justify-between text-slate-400">
+            <span>Mata Kuliah:</span>
+            <span class="text-slate-200">Algoritma & Pemrograman</span>
+          </div>
+          <div class="flex justify-between text-slate-400">
+            <span>Program Studi:</span>
+            <span class="text-slate-200">PTIK Semester II</span>
+          </div>
+          <div class="flex justify-between text-slate-400">
+            <span>Skor Evaluasi:</span>
+            <span id="modal-score-label" class="text-emerald-400 font-bold">100% (5/5 Benar)</span>
+          </div>
+          <div class="flex justify-between text-slate-400">
+            <span>Status:</span>
+            <span class="text-emerald-400 font-bold">LULUS KOMPETEN</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center gap-3">
+          <button id="modal-close-menu-btn" class="w-full py-3 text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-500 rounded-xl transition-colors cursor-pointer">
+            Kembali ke Menu Utama
+          </button>
+          <button id="modal-close-home-btn" class="w-full py-3 text-xs sm:text-sm font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors cursor-pointer">
+            Halaman Pembuka
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/80 bg-slate-950 py-6 px-4 text-center text-xs text-slate-400">
+      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-slate-300">Modul Pembelajaran Multimedia</span>
+          <span>·</span>
+          <span></span>
+        </div>
+        <div>
+          
+        </div>
+      </div>
+    </footer>
+
+    <!-- Pure JavaScript Entry Point -->
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

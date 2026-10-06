@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
 @layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
   body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: #070F20;
@@ -30,8 +33,8 @@
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: #0B1528;
@@ -44,9 +47,25 @@
   background: #334155;
 }
 
-/* Bar Glow and Animations */
+/* Hide scrollbar on mobile nav strip while keeping scrollability */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Bar Glow, Sizing, and Touch Ergonomics */
 .bar-element {
   transition: height 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s ease, background 0.3s ease, border-color 0.3s ease;
+  touch-action: manipulation;
+}
+
+.sim-bar-item {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .bar-selected {
@@ -84,5 +103,12 @@
   to {
     box-shadow: 0 0 20px rgba(245, 158, 11, 0.9);
     border-color: #FDE68A;
+  }
+}
+
+/* Prevent accidental zoom on mobile inputs */
+@media screen and (max-width: 768px) {
+  textarea, input, select {
+    font-size: 16px !important;
   }
 }

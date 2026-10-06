@@ -5,14 +5,16 @@ import confetti from 'canvas-confetti';
 // 1. WEB AUDIO SYNTHESIZER (MICRO-FEEDBACK)
 // ==========================================
 class SoundFX {
-  private ctx: AudioContext | null = null;
-  public enabled: boolean = true;
+  constructor() {
+    this.ctx = null;
+    this.enabled = true;
+  }
 
-  private getContext(): AudioContext | null {
+  getContext() {
     if (!this.enabled) return null;
     try {
       if (!this.ctx && typeof window !== 'undefined') {
-        const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
         this.ctx = new AudioCtx();
       }
       if (this.ctx && this.ctx.state === 'suspended') {
@@ -135,38 +137,45 @@ const soundFX = new SoundFX();
 // 2. GLOBAL STATE & NAVIGATION
 // ==========================================
 let currentScreen = 1;
-const visitedScreens = new Set<number>([1]);
+const visitedScreens = new Set([1]);
 
-function navigateTo(screenId: number) {
-  if (screenId < 1 || screenId > 6) return;
+function navigateTo(screenId) {
+  const targetId = Number(screenId);
+  if (targetId < 1 || targetId > 6) return;
 
-  currentScreen = screenId;
-  visitedScreens.add(screenId);
+  currentScreen = targetId;
+  visitedScreens.add(targetId);
 
   // Update DOM screens
-  document.querySelectorAll<HTMLElement>('.screen-view').forEach((section) => {
+  document.querySelectorAll('.screen-view').forEach((section) => {
     section.classList.remove('active');
   });
 
-  const targetSection = document.getElementById(`screen-${screenId}`);
+  const targetSection = document.getElementById(`screen-${targetId}`);
   if (targetSection) {
     targetSection.classList.add('active');
   }
 
-  // Update Navbar indicators
-  document.querySelectorAll<HTMLButtonElement>('.nav-screen-btn').forEach((btn) => {
+  // Update Navbar indicators (Desktop and Mobile)
+  document.querySelectorAll('.nav-screen-btn').forEach((btn) => {
     const target = Number(btn.getAttribute('data-nav-target'));
     const indicator = btn.querySelector('.nav-active-indicator');
-    if (target === screenId) {
-      btn.classList.remove('text-slate-300');
-      btn.classList.add('text-sky-400', 'font-semibold');
-      indicator?.classList.remove('hidden');
+    if (target === targetId) {
+      btn.classList.remove('text-slate-300', 'bg-slate-900/60');
+      btn.classList.add('text-sky-400', 'font-semibold', 'bg-sky-950/70');
+      if (indicator) indicator.classList.remove('hidden');
     } else {
-      btn.classList.remove('text-sky-400', 'font-semibold');
-      btn.classList.add('text-slate-300');
-      indicator?.classList.add('hidden');
+      btn.classList.remove('text-sky-400', 'font-semibold', 'bg-sky-950/70');
+      btn.classList.add('text-slate-300', 'bg-slate-900/60');
+      if (indicator) indicator.classList.add('hidden');
     }
   });
+
+  // Smooth scroll mobile nav into view if active
+  const activeMobileBtn = document.querySelector(`.mobile-nav-bar [data-nav-target="${targetId}"]`);
+  if (activeMobileBtn) {
+    activeMobileBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
 
   // Update Menu badges
   updateMenuBadges();
@@ -221,8 +230,8 @@ function resetAll() {
 // 3. LAYAR 1: HERO ANIMATED BAR PREVIEW
 // ==========================================
 let heroArray = [42, 18, 75, 29, 63, 10];
-let heroCompare: [number, number] | null = null;
-let heroTimer: NodeJS.Timeout | null = null;
+let heroCompare = null;
+let heroTimer = null;
 
 function renderHeroBars() {
   const container = document.getElementById('hero-bars-container');
@@ -234,11 +243,11 @@ function renderHeroBars() {
       const heightPercent = Math.max(18, (val / 80) * 100);
 
       return `
-      <div class="flex-1 max-w-[54px] flex flex-col items-center gap-2 group">
-        <span class="text-xs font-mono font-semibold transition-colors duration-200 ${
+      <div class="flex-1 max-w-[50px] min-w-[32px] flex flex-col items-center gap-1.5 sm:gap-2 group">
+        <span class="text-[11px] sm:text-xs font-mono font-semibold transition-colors duration-200 ${
           isComparing ? 'text-amber-400 scale-110 font-bold' : 'text-slate-300'
         }">${val}</span>
-        <div style="height: ${heightPercent}%" class="w-full rounded-t-lg transition-all duration-300 flex items-start justify-center pt-1.5 ${
+        <div style="height: ${heightPercent}%" class="w-full rounded-t-lg transition-all duration-300 flex items-start justify-center pt-1 ${
           isComparing
             ? 'bg-gradient-to-t from-amber-600 to-amber-400 shadow-lg shadow-amber-500/30 scale-105 ring-2 ring-amber-300'
             : 'bg-gradient-to-t from-blue-700 to-sky-500'
@@ -295,16 +304,7 @@ function startHeroDemo() {
 // ==========================================
 // 4. LAYAR 4: KONSEP & PASS 1 ANIMATOR
 // ==========================================
-interface DemoStep {
-  array: number[];
-  comparing: [number, number] | null;
-  action: 'compare' | 'swap' | 'keep' | 'pass_done';
-  description: string;
-  codeSnippet: string;
-  sortedIndices: number[];
-}
-
-const pass1Steps: DemoStep[] = [
+const pass1Steps = [
   {
     array: [5, 2, 8, 1, 9],
     comparing: null,
@@ -382,7 +382,7 @@ const pass1Steps: DemoStep[] = [
 let demoStepIdx = 0;
 let demoIsPlaying = false;
 let demoSpeed = 1200; // ms
-let demoTimer: NodeJS.Timeout | null = null;
+let demoTimer = null;
 
 function renderDemoBars() {
   const container = document.getElementById('demo-bars-container');
@@ -407,17 +407,17 @@ function renderDemoBars() {
       }
 
       return `
-      <div class="flex-1 max-w-[70px] flex flex-col items-center gap-2 z-10">
-        <span class="text-sm sm:text-base font-mono font-bold transition-all duration-300 ${
+      <div class="flex-1 max-w-[64px] min-w-[38px] flex flex-col items-center gap-1.5 sm:gap-2 z-10">
+        <span class="text-xs sm:text-base font-mono font-bold transition-all duration-300 ${
           isComparing ? 'text-amber-300 scale-125' : isSorted ? 'text-emerald-400' : 'text-slate-200'
         }">${val}</span>
         <div style="height: ${heightPercent}%" class="w-full rounded-t-xl transition-all duration-300 flex items-start justify-center pt-2 relative ${barClass}">
-          ${isSorted ? '<svg class="w-4 h-4 text-emerald-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' : ''}
+          ${isSorted ? '<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' : ''}
         </div>
         <div class="flex flex-col items-center">
-          <span class="text-xs font-mono text-slate-400">[${idx}]</span>
-          ${isComparing ? '<span class="text-[10px] text-amber-400 font-bold">aktif</span>' : ''}
-          ${isSorted ? '<span class="text-[10px] text-emerald-400 font-bold">kunci</span>' : ''}
+          <span class="text-[11px] sm:text-xs font-mono text-slate-400">[${idx}]</span>
+          ${isComparing ? '<span class="text-[9px] sm:text-[10px] text-amber-400 font-bold">aktif</span>' : ''}
+          ${isSorted ? '<span class="text-[9px] sm:text-[10px] text-emerald-400 font-bold">kunci</span>' : ''}
         </div>
       </div>
     `;
@@ -431,16 +431,16 @@ function renderDemoBars() {
   const badge = document.getElementById('demo-action-badge');
   if (badge) {
     if (step.action === 'swap') {
-      badge.className = 'text-xs font-mono px-3 py-1 rounded-full border border-rose-800 bg-rose-950/60 text-rose-400';
+      badge.className = 'text-[11px] sm:text-xs font-mono px-3 py-1 rounded-full border border-rose-800 bg-rose-950/60 text-rose-400';
       badge.textContent = '● PERTUKARAN (SWAP)';
     } else if (step.action === 'keep') {
-      badge.className = 'text-xs font-mono px-3 py-1 rounded-full border border-emerald-800 bg-emerald-950/60 text-emerald-400';
+      badge.className = 'text-[11px] sm:text-xs font-mono px-3 py-1 rounded-full border border-emerald-800 bg-emerald-950/60 text-emerald-400';
       badge.textContent = '✔ URUTAN TEPAT';
     } else if (step.action === 'compare') {
-      badge.className = 'text-xs font-mono px-3 py-1 rounded-full border border-amber-800 bg-amber-950/60 text-amber-400';
+      badge.className = 'text-[11px] sm:text-xs font-mono px-3 py-1 rounded-full border border-amber-800 bg-amber-950/60 text-amber-400';
       badge.textContent = '▲ MEMBANDINGKAN';
     } else if (step.action === 'pass_done') {
-      badge.className = 'text-xs font-mono px-3 py-1 rounded-full border border-sky-800 bg-sky-950/60 text-sky-300';
+      badge.className = 'text-[11px] sm:text-xs font-mono px-3 py-1 rounded-full border border-sky-800 bg-sky-950/60 text-sky-300';
       badge.textContent = '★ PASS 1 SELESAI';
     }
   }
@@ -461,7 +461,7 @@ function renderDemoDots() {
   container.innerHTML = pass1Steps
     .map(
       (_, idx) => `
-    <button data-dot-idx="${idx}" class="demo-dot w-2.5 h-2.5 rounded-full transition-all cursor-pointer ${
+    <button data-dot-idx="${idx}" class="demo-dot w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full transition-all cursor-pointer ${
         idx === demoStepIdx
           ? 'bg-sky-400 scale-125 ring-2 ring-sky-400/30'
           : idx < demoStepIdx
@@ -472,7 +472,7 @@ function renderDemoDots() {
     )
     .join('');
 
-  container.querySelectorAll<HTMLButtonElement>('.demo-dot').forEach((btn) => {
+  container.querySelectorAll('.demo-dot').forEach((btn) => {
     btn.onclick = () => {
       pausePass1Demo();
       demoStepIdx = Number(btn.getAttribute('data-dot-idx'));
@@ -544,13 +544,13 @@ function resetPass1Demo() {
 // 5. LAYAR 5: SIMULASI INTERAKTIF (STUDENT)
 // ==========================================
 let simArray = [5, 2, 8, 1, 9];
-let simSelectedIdx: number | null = null;
-let simLastCompared: [number, number] | null = null;
+let simSelectedIdx = null;
+let simLastCompared = null;
 let simStepCount = 0;
 let simSwapCount = 0;
-let simHintPair: [number, number] | null = null;
+let simHintPair = null;
 
-function checkIsSorted(arr: number[]): boolean {
+function checkIsSorted(arr) {
   for (let i = 0; i < arr.length - 1; i++) {
     if (arr[i] > arr[i + 1]) return false;
   }
@@ -583,8 +583,8 @@ function renderSimBars() {
       }
 
       return `
-      <div data-sim-idx="${idx}" class="sim-bar-item flex-1 max-w-[90px] flex flex-col items-center gap-2.5 z-10 cursor-pointer select-none group">
-        <span class="text-base sm:text-lg font-mono font-bold transition-transform duration-200 ${
+      <div data-sim-idx="${idx}" class="sim-bar-item flex-1 max-w-[80px] min-w-[42px] flex flex-col items-center gap-1.5 sm:gap-2.5 z-10 cursor-pointer select-none group touch-manipulation">
+        <span class="text-sm sm:text-lg font-mono font-bold transition-transform duration-200 ${
           isSelected
             ? 'text-sky-300 scale-125'
             : isHint
@@ -595,13 +595,13 @@ function renderSimBars() {
         }">${val}</span>
 
         <div style="height: ${heightPercent}%" class="w-full rounded-t-xl transition-all duration-300 flex items-start justify-center pt-2 relative ${barClass}">
-          ${isSorted ? '<svg class="w-5 h-5 text-emerald-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' : '<span class="w-2 h-2 rounded-full bg-white/40"></span>'}
+          ${isSorted ? '<svg class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' : '<span class="w-2 h-2 rounded-full bg-white/40"></span>'}
         </div>
 
         <div class="text-center">
-          <span class="text-xs font-mono text-slate-400 block">[${idx}]</span>
-          ${isSelected ? '<span class="text-[10px] text-cyan-300 font-bold block">Dipilih</span>' : ''}
-          ${isHint && !isSelected ? '<span class="text-[10px] text-amber-400 font-bold block">Bantuan</span>' : ''}
+          <span class="text-[11px] sm:text-xs font-mono text-slate-400 block">[${idx}]</span>
+          ${isSelected ? '<span class="text-[9px] sm:text-[10px] text-cyan-300 font-bold block">Dipilih</span>' : ''}
+          ${isHint && !isSelected ? '<span class="text-[9px] sm:text-[10px] text-amber-400 font-bold block">Bantuan</span>' : ''}
         </div>
       </div>
     `;
@@ -609,7 +609,7 @@ function renderSimBars() {
     .join('');
 
   // Attach click handlers to bars
-  container.querySelectorAll<HTMLElement>('.sim-bar-item').forEach((item) => {
+  container.querySelectorAll('.sim-bar-item').forEach((item) => {
     item.onclick = () => {
       const idx = Number(item.getAttribute('data-sim-idx'));
       handleSimBarClick(idx);
@@ -628,7 +628,7 @@ function renderSimBars() {
 
   const statusLabel = document.getElementById('sim-status-label');
   const statusIcon = document.getElementById('sim-status-icon');
-  const proceedBtn = document.getElementById('sim-proceed-quiz-btn') as HTMLButtonElement | null;
+  const proceedBtn = document.getElementById('sim-proceed-quiz-btn');
   const proceedHint = document.getElementById('sim-proceed-hint');
 
   if (isSorted) {
@@ -637,7 +637,7 @@ function renderSimBars() {
       statusLabel.className = 'text-xs font-bold text-emerald-400';
     }
     if (statusIcon) {
-      statusIcon.innerHTML = '<svg class="w-6 h-6 text-emerald-400 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"/></svg>';
+      statusIcon.innerHTML = '<svg class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"/></svg>';
     }
     if (proceedBtn) {
       proceedBtn.disabled = false;
@@ -666,7 +666,7 @@ function renderSimBars() {
   }
 }
 
-function setSimFeedback(type: 'info' | 'success' | 'warning' | 'celebrate', message: string) {
+function setSimFeedback(type, message) {
   const box = document.getElementById('sim-feedback-box');
   const icon = document.getElementById('sim-feedback-icon');
   const text = document.getElementById('sim-feedback-text');
@@ -690,7 +690,7 @@ function setSimFeedback(type: 'info' | 'success' | 'warning' | 'celebrate', mess
   }
 }
 
-function handleSimBarClick(idx: number) {
+function handleSimBarClick(idx) {
   soundFX.playBubble(440 + idx * 30);
   simHintPair = null;
 
@@ -782,7 +782,7 @@ function resetSimulation() {
 
 function randomizeSimArray() {
   soundFX.playBubble(420);
-  const newArr: number[] = [];
+  const newArr = [];
   while (newArr.length < 5) {
     const num = Math.floor(Math.random() * 20) + 1;
     if (!newArr.includes(num)) newArr.push(num);
@@ -820,16 +820,7 @@ function provideSimHint() {
 // ==========================================
 // 6. LAYAR 6: KUIS, UMPAN BALIK, & ASSESSMENT
 // ==========================================
-interface QuizQuestion {
-  id: number;
-  topic: string;
-  question: string;
-  options: string[];
-  correctIndex: number;
-  explanation: string;
-}
-
-const quizQuestions: QuizQuestion[] = [
+const quizQuestions = [
   {
     id: 1,
     topic: 'Langkah Dasar Algoritma',
@@ -908,9 +899,9 @@ const quizQuestions: QuizQuestion[] = [
 ];
 
 let quizCurrentIdx = 0;
-let quizSelectedOpt: number | null = null;
+let quizSelectedOpt = null;
 let quizHasChecked = false;
-let quizUserAnswers: (number | null)[] = new Array(quizQuestions.length).fill(null);
+let quizUserAnswers = new Array(quizQuestions.length).fill(null);
 
 function renderCurrentQuestion() {
   const q = quizQuestions[quizCurrentIdx];
@@ -951,21 +942,21 @@ function renderCurrentQuestion() {
       }
 
       return `
-      <button data-opt-idx="${optIdx}" ${quizHasChecked ? 'disabled' : ''} class="quiz-opt-btn w-full text-left p-4 rounded-xl border transition-all flex items-start justify-between gap-3 text-sm leading-relaxed cursor-pointer ${styles}">
+      <button data-opt-idx="${optIdx}" ${quizHasChecked ? 'disabled' : ''} class="quiz-opt-btn w-full text-left p-3.5 sm:p-4 rounded-xl border transition-all flex items-start justify-between gap-3 text-xs sm:text-sm leading-relaxed cursor-pointer touch-manipulation ${styles}">
         <span>${opt}</span>
-        ${quizHasChecked && isCorrect ? '<span class="text-emerald-400 font-bold">✔</span>' : ''}
-        ${quizHasChecked && isSelected && !isCorrect ? '<span class="text-rose-400 font-bold">✖</span>' : ''}
+        ${quizHasChecked && isCorrect ? '<span class="text-emerald-400 font-bold shrink-0">✔</span>' : ''}
+        ${quizHasChecked && isSelected && !isCorrect ? '<span class="text-rose-400 font-bold shrink-0">✖</span>' : ''}
       </button>
     `;
     })
     .join('');
 
-  optContainer.querySelectorAll<HTMLButtonElement>('.quiz-opt-btn').forEach((btn) => {
+  optContainer.querySelectorAll('.quiz-opt-btn').forEach((btn) => {
     btn.onclick = () => {
       if (quizHasChecked) return;
       soundFX.playBubble(460);
       quizSelectedOpt = Number(btn.getAttribute('data-opt-idx'));
-      const checkBtn = document.getElementById('quiz-check-btn') as HTMLButtonElement | null;
+      const checkBtn = document.getElementById('quiz-check-btn');
       if (checkBtn) checkBtn.disabled = false;
       renderCurrentQuestion();
     };
@@ -975,7 +966,7 @@ function renderCurrentQuestion() {
   const feedbackIcon = document.getElementById('quiz-feedback-icon');
   const feedbackHead = document.getElementById('quiz-feedback-heading');
   const feedbackExp = document.getElementById('quiz-feedback-explanation');
-  const checkBtn = document.getElementById('quiz-check-btn') as HTMLButtonElement | null;
+  const checkBtn = document.getElementById('quiz-check-btn');
   const nextBtn = document.getElementById('quiz-next-btn');
   const nextLabel = document.getElementById('quiz-next-label');
   const instruction = document.getElementById('quiz-instruction-text');
@@ -985,12 +976,12 @@ function renderCurrentQuestion() {
       feedbackBox.classList.remove('hidden');
       const isCorrect = quizSelectedOpt === q.correctIndex;
       if (isCorrect) {
-        feedbackBox.className = 'p-4 rounded-xl border border-emerald-700 bg-emerald-950/60 text-emerald-100 flex items-start gap-3 text-sm leading-relaxed';
-        feedbackIcon.innerHTML = '<span class="text-emerald-400 font-bold text-lg">✔</span>';
+        feedbackBox.className = 'p-3.5 sm:p-4 rounded-xl border border-emerald-700 bg-emerald-950/60 text-emerald-100 flex items-start gap-3 text-xs sm:text-sm leading-relaxed';
+        feedbackIcon.innerHTML = '<span class="text-emerald-400 font-bold text-base sm:text-lg">✔</span>';
         feedbackHead.textContent = 'Tepat Sekali!';
       } else {
-        feedbackBox.className = 'p-4 rounded-xl border border-rose-700 bg-rose-950/60 text-rose-100 flex items-start gap-3 text-sm leading-relaxed';
-        feedbackIcon.innerHTML = '<span class="text-rose-400 font-bold text-lg">✖</span>';
+        feedbackBox.className = 'p-3.5 sm:p-4 rounded-xl border border-rose-700 bg-rose-950/60 text-rose-100 flex items-start gap-3 text-xs sm:text-sm leading-relaxed';
+        feedbackIcon.innerHTML = '<span class="text-rose-400 font-bold text-base sm:text-lg">✖</span>';
         feedbackHead.textContent = 'Belum Tepat, Ingat Kembali Konsepnya:';
       }
       feedbackExp.textContent = q.explanation;
@@ -1049,7 +1040,7 @@ function showQuizResult() {
   if (resultView) resultView.classList.remove('hidden');
   if (counterBox) counterBox.classList.add('hidden');
 
-  const correctCount = quizUserAnswers.reduce<number>((acc, ans, idx) => {
+  const correctCount = quizUserAnswers.reduce((acc, ans, idx) => {
     return ans === quizQuestions[idx].correctIndex ? acc + 1 : acc;
   }, 0);
 
@@ -1079,7 +1070,7 @@ function showQuizResult() {
     }
 
     if (scoreRing) {
-      scoreRing.className = 'w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 flex flex-col items-center justify-center p-2 mb-4 border-emerald-500 bg-emerald-950/40 text-emerald-400 shadow-xl shadow-emerald-500/20 ring-4 ring-emerald-500/20';
+      scoreRing.className = 'w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 flex flex-col items-center justify-center p-2 mb-4 border-emerald-500 bg-emerald-950/40 text-emerald-400 shadow-xl shadow-emerald-500/20 ring-4 ring-emerald-500/20';
     }
     if (glow) glow.className = 'absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full blur-3xl pointer-events-none opacity-20 bg-emerald-500';
 
@@ -1099,30 +1090,37 @@ function showQuizResult() {
 
     if (actions) {
       actions.innerHTML = `
-        <button id="btn-result-finish" class="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-emerald-500 to-sky-500 hover:from-emerald-400 hover:to-sky-400 text-white shadow-xl shadow-emerald-500/25 transition-all cursor-pointer">
+        <button id="btn-result-finish" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-emerald-500 to-sky-500 hover:from-emerald-400 hover:to-sky-400 text-white shadow-xl shadow-emerald-500/25 transition-all cursor-pointer">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"/></svg>
           <span>Selesai & Ringkasan Modul</span>
         </button>
-        <button id="btn-result-retake" class="inline-flex items-center gap-2 px-5 py-3.5 text-sm font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors cursor-pointer">
+        <button id="btn-result-retake" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors cursor-pointer">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           <span>Uji Kuis Lagi</span>
         </button>
       `;
 
-      document.getElementById('btn-result-finish')!.onclick = () => {
-        soundFX.playSuccess();
-        const modal = document.getElementById('modal-completion');
-        if (modal) modal.classList.remove('hidden');
-      };
-      document.getElementById('btn-result-retake')!.onclick = () => {
-        resetQuizState();
-      };
+      const finishBtn = document.getElementById('btn-result-finish');
+      if (finishBtn) {
+        finishBtn.onclick = () => {
+          soundFX.playSuccess();
+          const modal = document.getElementById('modal-completion');
+          if (modal) modal.classList.remove('hidden');
+        };
+      }
+
+      const retakeBtn = document.getElementById('btn-result-retake');
+      if (retakeBtn) {
+        retakeBtn.onclick = () => {
+          resetQuizState();
+        };
+      }
     }
   } else {
     // Score < 80%
     soundFX.playWarning();
     if (scoreRing) {
-      scoreRing.className = 'w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 flex flex-col items-center justify-center p-2 mb-4 border-amber-500 bg-amber-950/40 text-amber-400 shadow-xl shadow-amber-500/20';
+      scoreRing.className = 'w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 flex flex-col items-center justify-center p-2 mb-4 border-amber-500 bg-amber-950/40 text-amber-400 shadow-xl shadow-amber-500/20';
     }
     if (glow) glow.className = 'absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full blur-3xl pointer-events-none opacity-20 bg-amber-500';
 
@@ -1142,24 +1140,31 @@ function showQuizResult() {
 
     if (actions) {
       actions.innerHTML = `
-        <button id="btn-result-repeat-theory" class="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold shadow-xl shadow-amber-500/25 transition-all cursor-pointer">
+        <button id="btn-result-repeat-theory" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold shadow-xl shadow-amber-500/25 transition-all cursor-pointer">
           <svg class="w-5 h-5 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
           <span>Ulangi Materi (Kembali ke Konsep Layar 4)</span>
         </button>
-        <button id="btn-result-retake" class="inline-flex items-center gap-2 px-5 py-3.5 text-sm font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors cursor-pointer">
+        <button id="btn-result-retake" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors cursor-pointer">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           <span>Coba Kuis Lagi</span>
         </button>
       `;
 
       // Returns to Screen 4 (Konsep & Cara Kerja) as explicitly required by prompt
-      document.getElementById('btn-result-repeat-theory')!.onclick = () => {
-        soundFX.playBubble(420);
-        navigateTo(4);
-      };
-      document.getElementById('btn-result-retake')!.onclick = () => {
-        resetQuizState();
-      };
+      const repeatBtn = document.getElementById('btn-result-repeat-theory');
+      if (repeatBtn) {
+        repeatBtn.onclick = () => {
+          soundFX.playBubble(420);
+          navigateTo(4);
+        };
+      }
+
+      const retakeBtn = document.getElementById('btn-result-retake');
+      if (retakeBtn) {
+        retakeBtn.onclick = () => {
+          resetQuizState();
+        };
+      }
     }
   }
 }
@@ -1186,7 +1191,7 @@ function resetQuizState() {
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
   // Navigation buttons with data-nav-target
-  document.querySelectorAll<HTMLElement>('[data-nav-target]').forEach((el) => {
+  document.querySelectorAll('[data-nav-target]').forEach((el) => {
     el.addEventListener('click', () => {
       const target = Number(el.getAttribute('data-nav-target'));
       soundFX.playBubble(440);
@@ -1285,7 +1290,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const speedNormal = document.getElementById('speed-normal');
   const speedFast = document.getElementById('speed-fast');
 
-  const updateSpeedActive = (activeBtn: HTMLElement, speed: number) => {
+  const updateSpeedActive = (activeBtn, speed) => {
     demoSpeed = speed;
     [speedSlow, speedNormal, speedFast].forEach((btn) => {
       if (btn === activeBtn) {
@@ -1334,7 +1339,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (reflectionForm) {
     reflectionForm.onsubmit = (e) => {
       e.preventDefault();
-      const input = document.getElementById('reflection-input') as HTMLTextAreaElement | null;
+      const input = document.getElementById('reflection-input');
       if (!input || !input.value.trim()) return;
 
       soundFX.playSuccess();
@@ -1347,10 +1352,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Reflection prompt chips
-  document.querySelectorAll<HTMLButtonElement>('.reflection-chip').forEach((chip) => {
+  document.querySelectorAll('.reflection-chip').forEach((chip) => {
     chip.onclick = () => {
       const text = chip.getAttribute('data-text');
-      const input = document.getElementById('reflection-input') as HTMLTextAreaElement | null;
+      const input = document.getElementById('reflection-input');
       if (input && text) {
         input.value = text;
         input.focus();

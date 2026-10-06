@@ -1,6 +1,3 @@
-import './style.css';
-import confetti from 'canvas-confetti';
-
 // ==========================================
 // 1. WEB AUDIO SYNTHESIZER (MICRO-FEEDBACK)
 // ==========================================
@@ -134,7 +131,77 @@ class SoundFX {
 const soundFX = new SoundFX();
 
 // ==========================================
-// 2. GLOBAL STATE & NAVIGATION
+// 2. STANDALONE CANVAS CONFETTI (NO NPM DEPENDENCY)
+// ==========================================
+function triggerConfetti() {
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'fixed';
+    canvas.style.inset = '0';
+    canvas.style.width = '100vw';
+    canvas.style.height = '100vh';
+    canvas.style.zIndex = '9999';
+    canvas.style.pointerEvents = 'none';
+    document.body.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+    const colors = ['#38BDF8', '#818CF8', '#34D399', '#FBBF24', '#F43F5E', '#A78BFA'];
+
+    for (let i = 0; i < 85; i++) {
+      particles.push({
+        x: canvas.width * 0.5,
+        y: canvas.height * 0.55,
+        vx: (Math.random() - 0.5) * 16,
+        vy: (Math.random() - 0.75) * 18,
+        size: Math.random() * 8 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rotation: Math.random() * 360,
+        rSpeed: (Math.random() - 0.5) * 10,
+        alpha: 1,
+      });
+    }
+
+    let animationFrame;
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.45; // gravity
+        p.rotation += p.rSpeed;
+        p.alpha -= 0.012;
+
+        if (p.alpha > 0) {
+          alive = true;
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.alpha);
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+          ctx.restore();
+        }
+      }
+      if (alive) {
+        animationFrame = requestAnimationFrame(update);
+      } else {
+        cancelAnimationFrame(animationFrame);
+        canvas.remove();
+      }
+    }
+    update();
+  } catch {
+    // Canvas fallback
+  }
+}
+
+// ==========================================
+// 3. GLOBAL STATE & NAVIGATION
 // ==========================================
 let currentScreen = 1;
 const visitedScreens = new Set([1]);
@@ -156,17 +223,17 @@ function navigateTo(screenId) {
     targetSection.classList.add('active');
   }
 
-  // Update Navbar indicators (Desktop and Mobile)
+  // Update Navbar indicators (Desktop and Mobile) - Text only, no box/background
   document.querySelectorAll('.nav-screen-btn').forEach((btn) => {
     const target = Number(btn.getAttribute('data-nav-target'));
     const indicator = btn.querySelector('.nav-active-indicator');
     if (target === targetId) {
-      btn.classList.remove('text-slate-300', 'bg-slate-900/60');
-      btn.classList.add('text-sky-400', 'font-semibold', 'bg-sky-950/70');
+      btn.classList.remove('text-slate-400', 'font-normal');
+      btn.classList.add('text-sky-400', 'font-semibold');
       if (indicator) indicator.classList.remove('hidden');
     } else {
-      btn.classList.remove('text-sky-400', 'font-semibold', 'bg-sky-950/70');
-      btn.classList.add('text-slate-300', 'bg-slate-900/60');
+      btn.classList.remove('text-sky-400', 'font-semibold');
+      btn.classList.add('text-slate-400', 'font-normal');
       if (indicator) indicator.classList.add('hidden');
     }
   });
@@ -227,7 +294,7 @@ function resetAll() {
 }
 
 // ==========================================
-// 3. LAYAR 1: HERO ANIMATED BAR PREVIEW
+// 4. LAYAR 1: HERO ANIMATED BAR PREVIEW
 // ==========================================
 let heroArray = [42, 18, 75, 29, 63, 10];
 let heroCompare = null;
@@ -240,19 +307,21 @@ function renderHeroBars() {
   container.innerHTML = heroArray
     .map((val, idx) => {
       const isComparing = heroCompare && (heroCompare[0] === idx || heroCompare[1] === idx);
-      const heightPercent = Math.max(18, (val / 80) * 100);
+      const heightPercent = Math.max(18, Math.min(100, (val / 80) * 100));
 
       return `
-      <div class="flex-1 max-w-[50px] min-w-[32px] flex flex-col items-center gap-1.5 sm:gap-2 group">
-        <span class="text-[11px] sm:text-xs font-mono font-semibold transition-colors duration-200 ${
-          isComparing ? 'text-amber-400 scale-110 font-bold' : 'text-slate-300'
+      <div class="flex-1 max-w-[48px] min-w-[28px] h-full flex flex-col items-center justify-end">
+        <span class="text-[10px] sm:text-xs font-mono font-bold shrink-0 mb-1 transition-colors duration-200 ${
+          isComparing ? 'text-amber-400 scale-110' : 'text-slate-300'
         }">${val}</span>
-        <div style="height: ${heightPercent}%" class="w-full rounded-t-lg transition-all duration-300 flex items-start justify-center pt-1 ${
-          isComparing
-            ? 'bg-gradient-to-t from-amber-600 to-amber-400 shadow-lg shadow-amber-500/30 scale-105 ring-2 ring-amber-300'
-            : 'bg-gradient-to-t from-blue-700 to-sky-500'
-        }">
-          <span class="w-1.5 h-1.5 rounded-full bg-white/50"></span>
+        <div class="flex-1 w-full flex items-end justify-center min-h-0">
+          <div style="height: ${heightPercent}%" class="w-full rounded-t-lg transition-all duration-300 flex items-start justify-center pt-0.5 ${
+            isComparing
+              ? 'bg-gradient-to-t from-amber-600 to-amber-400 shadow-md shadow-amber-500/30 ring-2 ring-amber-300'
+              : 'bg-gradient-to-t from-blue-700 to-sky-500'
+          }">
+            <span class="w-1.5 h-1.5 rounded-full bg-white/50"></span>
+          </div>
         </div>
       </div>
     `;
@@ -302,7 +371,7 @@ function startHeroDemo() {
 }
 
 // ==========================================
-// 4. LAYAR 4: KONSEP & PASS 1 ANIMATOR
+// 5. LAYAR 4: KONSEP & PASS 1 ANIMATOR
 // ==========================================
 const pass1Steps = [
   {
@@ -395,29 +464,36 @@ function renderDemoBars() {
       const isComparing = step.comparing && (step.comparing[0] === idx || step.comparing[1] === idx);
       const isSwapped = isComparing && step.action === 'swap';
       const isSorted = step.sortedIndices.includes(idx);
-      const heightPercent = Math.max(22, (val / 10) * 100);
+      const heightPercent = Math.max(20, Math.min(100, (val / 10) * 100));
 
       let barClass = 'bg-gradient-to-t from-blue-700 via-sky-600 to-sky-400 opacity-90';
       if (isSwapped) {
-        barClass = 'bg-gradient-to-t from-rose-700 to-rose-400 shadow-xl shadow-rose-500/30 ring-2 ring-rose-300 animate-pulse';
+        barClass = 'bg-gradient-to-t from-rose-700 to-rose-400 shadow-lg shadow-rose-500/30 ring-2 ring-rose-300 animate-pulse';
       } else if (isComparing) {
-        barClass = 'bg-gradient-to-t from-amber-600 to-amber-400 shadow-xl shadow-amber-500/30 ring-2 ring-amber-300';
+        barClass = 'bg-gradient-to-t from-amber-600 to-amber-400 shadow-lg shadow-amber-500/30 ring-2 ring-amber-300';
       } else if (isSorted) {
-        barClass = 'bg-gradient-to-t from-emerald-600 to-emerald-400 shadow-lg shadow-emerald-500/20 ring-1 ring-emerald-300';
+        barClass = 'bg-gradient-to-t from-emerald-600 to-emerald-400 shadow-md shadow-emerald-500/20 ring-1 ring-emerald-300';
       }
 
       return `
-      <div class="flex-1 max-w-[64px] min-w-[38px] flex flex-col items-center gap-1.5 sm:gap-2 z-10">
-        <span class="text-xs sm:text-base font-mono font-bold transition-all duration-300 ${
-          isComparing ? 'text-amber-300 scale-125' : isSorted ? 'text-emerald-400' : 'text-slate-200'
+      <div class="flex-1 max-w-[60px] min-w-[32px] h-full flex flex-col items-center justify-end z-10">
+        <!-- Number at top: strictly non-overlapping -->
+        <span class="text-xs sm:text-sm font-mono font-bold shrink-0 mb-1 transition-all duration-300 ${
+          isComparing ? 'text-amber-300 scale-110' : isSorted ? 'text-emerald-400' : 'text-slate-200'
         }">${val}</span>
-        <div style="height: ${heightPercent}%" class="w-full rounded-t-xl transition-all duration-300 flex items-start justify-center pt-2 relative ${barClass}">
-          ${isSorted ? '<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' : ''}
+
+        <!-- Bar Track: flexible middle area -->
+        <div class="flex-1 w-full flex items-end justify-center min-h-0">
+          <div style="height: ${heightPercent}%" class="w-full rounded-t-xl transition-all duration-300 flex items-start justify-center pt-1 relative ${barClass}">
+            ${isSorted ? '<svg class="w-3.5 h-3.5 text-emerald-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' : ''}
+          </div>
         </div>
-        <div class="flex flex-col items-center">
-          <span class="text-[11px] sm:text-xs font-mono text-slate-400">[${idx}]</span>
-          ${isComparing ? '<span class="text-[9px] sm:text-[10px] text-amber-400 font-bold">aktif</span>' : ''}
-          ${isSorted ? '<span class="text-[9px] sm:text-[10px] text-emerald-400 font-bold">kunci</span>' : ''}
+
+        <!-- Index & Status Badge at bottom: strictly non-overlapping -->
+        <div class="shrink-0 mt-1 flex flex-col items-center">
+          <span class="text-[10px] sm:text-xs font-mono text-slate-400 leading-tight">[${idx}]</span>
+          ${isComparing ? '<span class="text-[9px] text-amber-400 font-bold leading-tight">aktif</span>' : ''}
+          ${isSorted ? '<span class="text-[9px] text-emerald-400 font-bold leading-tight">kunci</span>' : ''}
         </div>
       </div>
     `;
@@ -541,7 +617,7 @@ function resetPass1Demo() {
 }
 
 // ==========================================
-// 5. LAYAR 5: SIMULASI INTERAKTIF (STUDENT)
+// 6. LAYAR 5: SIMULASI INTERAKTIF (SISWA)
 // ==========================================
 let simArray = [5, 2, 8, 1, 9];
 let simSelectedIdx = null;
@@ -569,39 +645,44 @@ function renderSimBars() {
       const isSelected = simSelectedIdx === idx;
       const isHint = simHintPair && (simHintPair[0] === idx || simHintPair[1] === idx);
       const isLast = simLastCompared && (simLastCompared[0] === idx || simLastCompared[1] === idx);
-      const heightPercent = Math.max(25, (val / maxVal) * 100);
+      const heightPercent = Math.max(20, Math.min(100, (val / maxVal) * 100));
 
-      let barClass = 'bg-gradient-to-t from-slate-700 via-blue-800 to-sky-600 group-hover:from-blue-600 group-hover:to-sky-400 group-hover:-translate-y-1';
+      let barClass = 'bg-gradient-to-t from-slate-700 via-blue-800 to-sky-600 group-hover:from-blue-600 group-hover:to-sky-400';
       if (isSorted) {
-        barClass = 'bg-gradient-to-t from-emerald-700 via-emerald-600 to-emerald-400 shadow-lg shadow-emerald-500/25 ring-2 ring-emerald-300';
+        barClass = 'bg-gradient-to-t from-emerald-700 via-emerald-600 to-emerald-400 shadow-md shadow-emerald-500/25 ring-2 ring-emerald-300';
       } else if (isSelected) {
-        barClass = 'bg-gradient-to-t from-sky-600 to-cyan-400 shadow-xl shadow-cyan-500/40 ring-4 ring-cyan-300 -translate-y-2';
+        barClass = 'bg-gradient-to-t from-sky-600 to-cyan-400 shadow-lg shadow-cyan-500/40 ring-2 ring-cyan-300';
       } else if (isHint) {
-        barClass = 'bg-gradient-to-t from-amber-600 to-amber-400 shadow-lg shadow-amber-500/30 ring-2 ring-amber-300 animate-pulse';
+        barClass = 'bg-gradient-to-t from-amber-600 to-amber-400 shadow-md shadow-amber-500/30 ring-2 ring-amber-300 animate-pulse';
       } else if (isLast) {
         barClass = 'bg-gradient-to-t from-indigo-700 to-blue-500 ring-1 ring-blue-400/50';
       }
 
       return `
-      <div data-sim-idx="${idx}" class="sim-bar-item flex-1 max-w-[80px] min-w-[42px] flex flex-col items-center gap-1.5 sm:gap-2.5 z-10 cursor-pointer select-none group touch-manipulation">
-        <span class="text-sm sm:text-lg font-mono font-bold transition-transform duration-200 ${
+      <div data-sim-idx="${idx}" class="sim-bar-item flex-1 max-w-[68px] min-w-[34px] h-full flex flex-col items-center justify-end z-10 cursor-pointer select-none group touch-manipulation">
+        <!-- Number at top: strictly non-overlapping -->
+        <span class="text-xs sm:text-base font-mono font-bold shrink-0 mb-1 transition-transform duration-200 ${
           isSelected
-            ? 'text-sky-300 scale-125'
+            ? 'text-sky-300 scale-110'
             : isHint
-            ? 'text-amber-300 scale-110'
+            ? 'text-amber-300 scale-105'
             : isSorted
             ? 'text-emerald-400'
             : 'text-white group-hover:text-sky-300'
         }">${val}</span>
 
-        <div style="height: ${heightPercent}%" class="w-full rounded-t-xl transition-all duration-300 flex items-start justify-center pt-2 relative ${barClass}">
-          ${isSorted ? '<svg class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' : '<span class="w-2 h-2 rounded-full bg-white/40"></span>'}
+        <!-- Bar Track: flexible middle area -->
+        <div class="flex-1 w-full flex items-end justify-center min-h-0">
+          <div style="height: ${heightPercent}%" class="w-full rounded-t-xl transition-all duration-300 flex items-start justify-center pt-1 relative ${barClass}">
+            ${isSorted ? '<svg class="w-3.5 h-3.5 text-emerald-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' : '<span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>'}
+          </div>
         </div>
 
-        <div class="text-center">
-          <span class="text-[11px] sm:text-xs font-mono text-slate-400 block">[${idx}]</span>
-          ${isSelected ? '<span class="text-[9px] sm:text-[10px] text-cyan-300 font-bold block">Dipilih</span>' : ''}
-          ${isHint && !isSelected ? '<span class="text-[9px] sm:text-[10px] text-amber-400 font-bold block">Bantuan</span>' : ''}
+        <!-- Index & Status at bottom: strictly non-overlapping -->
+        <div class="shrink-0 mt-1 text-center">
+          <span class="text-[10px] sm:text-xs font-mono text-slate-400 block leading-tight">[${idx}]</span>
+          ${isSelected ? '<span class="text-[9px] text-cyan-300 font-bold block leading-tight">Dipilih</span>' : ''}
+          ${isHint && !isSelected ? '<span class="text-[9px] text-amber-400 font-bold block leading-tight">Bantuan</span>' : ''}
         </div>
       </div>
     `;
@@ -637,7 +718,7 @@ function renderSimBars() {
       statusLabel.className = 'text-xs font-bold text-emerald-400';
     }
     if (statusIcon) {
-      statusIcon.innerHTML = '<svg class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"/></svg>';
+      statusIcon.innerHTML = '<svg class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 01-3.138-3.138z"/></svg>';
     }
     if (proceedBtn) {
       proceedBtn.disabled = false;
@@ -741,11 +822,7 @@ function handleSimBarClick(idx) {
     const isNowSorted = checkIsSorted(simArray);
     if (isNowSorted) {
       soundFX.playSuccess();
-      try {
-        confetti({ particleCount: 90, spread: 75, origin: { y: 0.6 } });
-      } catch {
-        // confetti fallback
-      }
+      triggerConfetti();
       setSimFeedback(
         'celebrate',
         `Luar biasa! ${leftVal} > ${rightVal} berhasil ditukar. SELURUH ARRAY KINI TERURUT SEMPURNA [${simArray.join(', ')}]! 🎉 Tombol Lanjut ke Kuis sekarang aktif.`
@@ -818,7 +895,7 @@ function provideSimHint() {
 }
 
 // ==========================================
-// 6. LAYAR 6: KUIS, UMPAN BALIK, & ASSESSMENT
+// 7. LAYAR 6: KUIS, UMPAN BALIK, & ASSESSMENT
 // ==========================================
 const quizQuestions = [
   {
@@ -942,7 +1019,7 @@ function renderCurrentQuestion() {
       }
 
       return `
-      <button data-opt-idx="${optIdx}" ${quizHasChecked ? 'disabled' : ''} class="quiz-opt-btn w-full text-left p-3.5 sm:p-4 rounded-xl border transition-all flex items-start justify-between gap-3 text-xs sm:text-sm leading-relaxed cursor-pointer touch-manipulation ${styles}">
+      <button data-opt-idx="${optIdx}" ${quizHasChecked ? 'disabled' : ''} class="quiz-opt-btn w-full text-left py-2 px-3 sm:py-2.5 sm:px-3.5 rounded-xl border transition-all flex items-start justify-between gap-3 text-xs sm:text-sm leading-snug cursor-pointer touch-manipulation ${styles}">
         <span>${opt}</span>
         ${quizHasChecked && isCorrect ? '<span class="text-emerald-400 font-bold shrink-0">✔</span>' : ''}
         ${quizHasChecked && isSelected && !isCorrect ? '<span class="text-rose-400 font-bold shrink-0">✖</span>' : ''}
@@ -1063,21 +1140,17 @@ function showQuizResult() {
 
   if (isPassed) {
     soundFX.playSuccess();
-    try {
-      confetti({ particleCount: 120, spread: 90, origin: { y: 0.5 } });
-    } catch {
-      // ignore
-    }
+    triggerConfetti();
 
     if (scoreRing) {
-      scoreRing.className = 'w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 flex flex-col items-center justify-center p-2 mb-4 border-emerald-500 bg-emerald-950/40 text-emerald-400 shadow-xl shadow-emerald-500/20 ring-4 ring-emerald-500/20';
+      scoreRing.className = 'w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 flex flex-col items-center justify-center p-1.5 mb-2 border-emerald-500 bg-emerald-950/40 text-emerald-400 shadow-lg shadow-emerald-500/20 ring-2 ring-emerald-500/20';
     }
-    if (glow) glow.className = 'absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full blur-3xl pointer-events-none opacity-20 bg-emerald-500';
+    if (glow) glow.className = 'absolute -top-24 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full blur-3xl pointer-events-none opacity-20 bg-emerald-500';
 
     if (badgeContainer) {
       badgeContainer.innerHTML = `
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-700 text-emerald-300 text-xs font-semibold">
-          <span>🏆 Lencana Penguasaan Bubble Sort (Semester II PTIK)</span>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-700 text-emerald-300 text-xs font-semibold">
+          <span>🏆 Lencana Penguasaan Bubble Sort (Tingkat Siswa)</span>
         </div>
       `;
     }
@@ -1085,16 +1158,16 @@ function showQuizResult() {
     if (title) title.textContent = 'Kerja Bagus! Penguasaan Sangat Baik';
     if (msg) {
       msg.textContent =
-        'Anda telah menunjukkan pemahaman yang matang mengenai algoritma Bubble Sort, mulai dari mekanisme perbandingan bersebelahan, pergeseran nilai terbesar pada tiap pass, hingga analisis kompleksitas waktu kuadratik.';
+        'Kamu telah menunjukkan pemahaman yang matang mengenai algoritma Bubble Sort, perbandingan bersebelahan, pergeseran nilai terbesar tiap pass, hingga kompleksitas waktu.';
     }
 
     if (actions) {
       actions.innerHTML = `
-        <button id="btn-result-finish" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-emerald-500 to-sky-500 hover:from-emerald-400 hover:to-sky-400 text-white shadow-xl shadow-emerald-500/25 transition-all cursor-pointer">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"/></svg>
+        <button id="btn-result-finish" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold rounded-xl bg-gradient-to-r from-emerald-500 to-sky-500 hover:from-emerald-400 hover:to-sky-400 text-white shadow-lg shadow-emerald-500/25 transition-all cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"/></svg>
           <span>Selesai & Ringkasan Modul</span>
         </button>
-        <button id="btn-result-retake" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors cursor-pointer">
+        <button id="btn-result-retake" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors cursor-pointer">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           <span>Uji Kuis Lagi</span>
         </button>
@@ -1120,13 +1193,13 @@ function showQuizResult() {
     // Score < 80%
     soundFX.playWarning();
     if (scoreRing) {
-      scoreRing.className = 'w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 flex flex-col items-center justify-center p-2 mb-4 border-amber-500 bg-amber-950/40 text-amber-400 shadow-xl shadow-amber-500/20';
+      scoreRing.className = 'w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 flex flex-col items-center justify-center p-1.5 mb-2 border-amber-500 bg-amber-950/40 text-amber-400 shadow-lg shadow-amber-500/20';
     }
-    if (glow) glow.className = 'absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full blur-3xl pointer-events-none opacity-20 bg-amber-500';
+    if (glow) glow.className = 'absolute -top-24 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full blur-3xl pointer-events-none opacity-20 bg-amber-500';
 
     if (badgeContainer) {
       badgeContainer.innerHTML = `
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-950/80 border border-amber-700 text-amber-300 text-xs font-semibold">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/80 border border-amber-700 text-amber-300 text-xs font-semibold">
           <span>▲ Ambang Kelulusan: Minimal 80% (Perlu Pengulangan)</span>
         </div>
       `;
@@ -1140,17 +1213,17 @@ function showQuizResult() {
 
     if (actions) {
       actions.innerHTML = `
-        <button id="btn-result-repeat-theory" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold shadow-xl shadow-amber-500/25 transition-all cursor-pointer">
-          <svg class="w-5 h-5 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-          <span>Ulangi Materi (Kembali ke Konsep Layar 4)</span>
+        <button id="btn-result-repeat-theory" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold shadow-lg shadow-amber-500/25 transition-all cursor-pointer">
+          <svg class="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          <span>Ulangi Materi (Layar 4)</span>
         </button>
-        <button id="btn-result-retake" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors cursor-pointer">
+        <button id="btn-result-retake" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors cursor-pointer">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           <span>Coba Kuis Lagi</span>
         </button>
       `;
 
-      // Returns to Screen 4 (Konsep & Cara Kerja) as explicitly required by prompt
+      // Returns to Screen 4 (Konsep & Cara Kerja)
       const repeatBtn = document.getElementById('btn-result-repeat-theory');
       if (repeatBtn) {
         repeatBtn.onclick = () => {
@@ -1187,7 +1260,7 @@ function resetQuizState() {
 }
 
 // ==========================================
-// 7. INITIALIZATION & EVENT LISTENERS
+// 8. INITIALIZATION & EVENT LISTENERS
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
   // Navigation buttons with data-nav-target

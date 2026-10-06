@@ -1,6 +1,6 @@
 {
   "name": "Modul Pembelajaran Interaktif Bubble Sort PTIK",
-  "description": "Modul pembelajaran multimedia interaktif algoritma pengurutan Bubble Sort untuk siswa dengan visualisasi langkah demi langkah, simulasi hands-on, dan kuis adaptif.",
+  "description": "Modul pembelajaran multimedia interaktif algoritma pengurutan Bubble Sort untuk mahasiswa semester II PTIK dengan visualisasi langkah demi langkah, simulasi hands-on, dan kuis adaptif.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

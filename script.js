@@ -247,6 +247,13 @@ function navigateTo(screenId) {
   // Update Menu badges
   updateMenuBadges();
 
+  // Screen-specific triggers
+  if (targetId === 1) {
+    startHeroDemo();
+  } else if (heroTimer) {
+    clearTimeout(heroTimer);
+  }
+
   // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -1262,7 +1269,12 @@ function resetQuizState() {
 // ==========================================
 // 8. INITIALIZATION & EVENT LISTENERS
 // ==========================================
-document.addEventListener('DOMContentLoaded', () => {
+let appInitialized = false;
+
+function initApp() {
+  if (appInitialized) return;
+  appInitialized = true;
+
   // Navigation buttons with data-nav-target
   document.querySelectorAll('[data-nav-target]').forEach((el) => {
     el.addEventListener('click', () => {
@@ -1461,4 +1473,20 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSimBars();
   renderCurrentQuestion();
   updateMenuBadges();
+}
+
+// Safely execute initApp in all deployment environments (including Vercel / static CDN)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+
+// Global safety fallback for window load
+window.addEventListener('load', () => {
+  if (!appInitialized) {
+    initApp();
+  } else {
+    renderHeroBars();
+  }
 });

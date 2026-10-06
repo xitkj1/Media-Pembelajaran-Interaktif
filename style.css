@@ -60,6 +60,18 @@ html, body {
   transform: translateY(0);
 }
 
+/* Screen 1: Pembuka - Always ensure visualizer is never clipped */
+#screen-1.screen-view.active {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+@media (min-height: 580px) and (min-width: 1024px) {
+  #screen-1.screen-view.active {
+    overflow: hidden !important;
+  }
+}
+
 /* Screen 2: Peta Materi has smooth vertical scroll */
 #screen-2.screen-view.active {
   overflow-y: auto !important;

@@ -1,94 +1,40 @@
-/* ========================================================
-   MODUL PEMBELAJARAN INTERAKTIF BUBBLE SORT UNTUK SISWA
-   File: style.css (Vanilla CSS)
-   ======================================================== */
+@import "tailwindcss";
 
-*, *::before, *::after {
-  box-sizing: border-box;
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #070F20;
+    color: #F8FAFC;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+  .font-mono {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
 }
 
-html, body {
-  width: 100%;
-  width: 100vw;
-  height: 100%;
-  height: 100vh;
-  height: 100dvh;
-  max-height: 100vh;
-  max-height: 100dvh;
-  margin: 0;
-  padding: 0;
-  overflow: hidden !important;
-  -webkit-tap-highlight-color: transparent;
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #070F20;
-  color: #F8FAFC;
-}
-
-/* Ensure no vertical scroll on desktop / main viewport */
-#main-viewport {
-  flex: 1 1 0%;
-  min-height: 0;
-  height: 100%;
-  width: 100%;
-  overflow: hidden !important;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Screen Views */
+/* Screen Transitions */
 .screen-view {
-  display: none !important;
-  width: 100%;
-  height: 100%;
-  max-height: 100%;
-  overflow: hidden !important;
+  display: none;
   opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  transform: translateY(8px);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
 }
 
 .screen-view.active {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  width: 100% !important;
-  height: 100% !important;
-  max-height: 100% !important;
-  overflow: hidden !important;
+  display: block;
   opacity: 1;
   transform: translateY(0);
 }
 
-/* Screen 1: Pembuka - Always ensure visualizer is never clipped */
-#screen-1.screen-view.active {
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-}
-
-@media (min-height: 580px) and (min-width: 1024px) {
-  #screen-1.screen-view.active {
-    overflow: hidden !important;
-  }
-}
-
-/* Screen 2: Peta Materi has smooth vertical scroll */
-#screen-2.screen-view.active {
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  justify-content: flex-start !important;
-  scroll-behavior: smooth;
-  padding-bottom: 2rem;
-}
-
-.font-mono {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-}
-
-/* Custom Scrollbar (if any container allows inner scroll) */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: #0B1528;
@@ -98,7 +44,7 @@ html, body {
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #38BDF8;
+  background: #334155;
 }
 
 /* Hide scrollbar on mobile nav strip while keeping scrollability */
@@ -123,36 +69,39 @@ html, body {
 }
 
 .bar-selected {
-  box-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
+  transform: translateY(-8px);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
   border: 2px solid #38BDF8 !important;
 }
 
 .bar-comparing {
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
+  transform: translateY(-4px);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
   border: 2px solid #F59E0B !important;
 }
 
 .bar-swapped {
-  box-shadow: 0 0 16px rgba(244, 63, 94, 0.7);
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 0 0 20px rgba(244, 63, 94, 0.6);
   border: 2px solid #F43F5E !important;
 }
 
 .bar-sorted {
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
   border: 1px solid #10B981 !important;
 }
 
 .bar-hint {
-  animation: pulse-border 1.1s infinite alternate;
+  animation: pulse-border 1.2s infinite alternate;
 }
 
 @keyframes pulse-border {
   from {
-    box-shadow: 0 0 4px rgba(245, 158, 11, 0.4);
+    box-shadow: 0 0 5px rgba(245, 158, 11, 0.4);
     border-color: #F59E0B;
   }
   to {
-    box-shadow: 0 0 18px rgba(245, 158, 11, 0.95);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.9);
     border-color: #FDE68A;
   }
 }
